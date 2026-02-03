@@ -21,6 +21,7 @@ public class Conversation {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(nullable = false, length = 200)
     private String title;
 
     @Column(name = "created_at", nullable = false)
