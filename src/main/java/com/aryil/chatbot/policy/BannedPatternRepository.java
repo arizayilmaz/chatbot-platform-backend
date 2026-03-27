@@ -7,4 +7,6 @@ import java.util.UUID;
 
 public interface BannedPatternRepository extends JpaRepository<BannedPattern, UUID> {
     List<BannedPattern> findByEnabledTrue();
+
+    boolean existsByPattern(String pattern);
 }

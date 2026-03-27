@@ -2,6 +2,8 @@ package com.aryil.chatbot.auth;
 
 import com.aryil.chatbot.auth.dto.LoginRequest;
 import com.aryil.chatbot.auth.dto.RegisterRequest;
+import com.aryil.chatbot.common.exception.EmailAlreadyExistsException;
+import com.aryil.chatbot.common.exception.InvalidCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,7 @@ public class AuthService {
     @Transactional
     public String register(RegisterRequest req) {
         if (userRepository.existsByEmail(req.email())) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new EmailAlreadyExistsException("Email already in use");
         }
 
         User user = User.builder()
@@ -38,10 +40,10 @@ public class AuthService {
     @Transactional(readOnly = true)
     public String login(LoginRequest req) {
         User user = userRepository.findByEmail(req.email().toLowerCase())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(req.password(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         return jwtService.createToken(user);

@@ -2,6 +2,7 @@ package com.aryil.chatbot.auth;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -56,5 +57,15 @@ public class JwtService {
                 .getPayload()
                 .get("role");
         return role == null ? "USER" : role.toString();
+    }
+    @PostConstruct
+    void validateJwtSecret() {
+        String s = props.getSecret();
+        if (s == null || s.isBlank()) {
+            throw new IllegalStateException("JWT secret is missing. Set JWT_SECRET or app.jwt.secret");
+        }
+        if (s.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("JWT secret is too short. Use at least 32 bytes for HMAC.");
+        }
     }
 }
